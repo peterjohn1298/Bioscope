@@ -131,64 +131,58 @@ st.dataframe(df, use_container_width=True, hide_index=True,
                  'BioScope Differentiation': st.column_config.TextColumn(width='large'),
              })
 
-# ── Key differentiation summary ────────────────────────────────────────────────
+# ── Radar chart ───────────────────────────────────────────────────────────────
 st.divider()
-st.subheader("BioScope vs. Competition — 3 Core Differentiators")
+st.subheader("Capability Radar — BioScope vs. Key Competitors")
+st.caption("Scores across six dimensions that define value in protein quality certification.")
 
-d1, d2, d3 = st.columns(3)
+dimensions = [
+    'Turnaround Speed',
+    'Analyte Breadth',
+    'Certification Value',
+    'Sample Prep Simplicity',
+    'Welfare / Authenticity',
+    'Cost Efficiency',
+]
 
-with d1:
-    st.markdown(f"""
-    <div style="background:#EBF5FB;border-radius:10px;padding:16px;border-left:4px solid {BLUE}">
-        <div style="font-weight:700;color:{BLUE};margin-bottom:6px">⚡ Speed</div>
-        <div style="font-size:13px">
-        BioScope delivers results in <b>minutes</b> via ambient DESI-MS.
-        Commercial labs (Eurofins, SGS) require <b>3–21 days</b>.
-        Rapid kits are fast but answer only one question at a time.
-        </div>
-    </div>""", unsafe_allow_html=True)
-
-with d2:
-    st.markdown(f"""
-    <div style="background:#EAFAF1;border-radius:10px;padding:16px;border-left:4px solid {GREEN}">
-        <div style="font-weight:700;color:#196F3D;margin-bottom:6px">🔬 Comprehensiveness</div>
-        <div style="font-size:13px">
-        <b>14 analyte categories</b> across residues, welfare biomarkers, and authenticity markers in a
-        single scan — no sample fragmentation. Competitors either test one analyte class
-        (rapid kits) or charge per analyte (commercial labs).
-        </div>
-    </div>""", unsafe_allow_html=True)
-
-with d3:
-    st.markdown(f"""
-    <div style="background:#FEF9E7;border-radius:10px;padding:16px;border-left:4px solid {ORANGE}">
-        <div style="font-weight:700;color:#784212;margin-bottom:6px">🏷️ Certification Value</div>
-        <div style="font-size:13px">
-        No existing competitor combines <b>testing + welfare + authenticity + origin</b> into a single
-        investable certification badge. Bureau Veritas certifies process; BioScope certifies
-        the product. That's a new category.
-        </div>
-    </div>""", unsafe_allow_html=True)
-
-# ── White-space map ────────────────────────────────────────────────────────────
-st.markdown("<br>", unsafe_allow_html=True)
-st.subheader("White Space — Capability Gaps in the Market")
-
-gap_data = {
-    'Capability': [
-        'Multi-residue chemical testing',
-        'Animal welfare biomarkers (cortisol, lactate)',
-        'Species authentication (DNA)',
-        'Geographic origin (IRMS)',
-        'Nutritional fingerprint (fatty acids, vitamins)',
-        'All of the above in one scan',
-        'Certification badge + traceability report',
-    ],
-    'Commercial Labs': ['✅', '⚠️ Research only', '⚠️ Outsourced', '⚠️ Few labs', '✅ (unbundled, high cost)', '❌', '❌'],
-    'Rapid Test Kits': ['⚠️ Single analyte', '❌', '❌', '❌', '❌', '❌', '❌'],
-    'Instruments (Bruker etc.)': ['✅ (DIY)', '⚠️', '⚠️', '✅ (IRMS only)', '✅ (GC-FID)', '❌ (separate instruments)', '❌'],
-    'BioScope': ['✅', '✅', '✅', '✅', '✅', '✅', '✅'],
+radar_companies = {
+    'BioScope':         {'scores': [10, 10, 10, 10, 10, 9],  'color': GREEN,  'dash': 'solid',  'width': 4},
+    'Eurofins':         {'scores': [2,  7,  4,  3,  2,  4],  'color': '#E74C3C', 'dash': 'dot', 'width': 2},
+    'Neogen':           {'scores': [8,  2,  2,  8,  1,  7],  'color': ORANGE,    'dash': 'dot', 'width': 2},
+    'Bruker':           {'scores': [4,  7,  3,  2,  3,  3],  'color': '#9B59B6', 'dash': 'dot', 'width': 2},
 }
 
-gap_df = pd.DataFrame(gap_data)
-st.dataframe(gap_df, use_container_width=True, hide_index=True)
+fig_radar = go.Figure()
+
+for company, cfg in radar_companies.items():
+    scores = cfg['scores'] + [cfg['scores'][0]]  # close the polygon
+    cats   = dimensions + [dimensions[0]]
+    fig_radar.add_trace(go.Scatterpolar(
+        r=scores,
+        theta=cats,
+        fill='toself' if company == 'BioScope' else 'none',
+        fillcolor='rgba(46,204,113,0.15)' if company == 'BioScope' else 'rgba(0,0,0,0)',
+        name=company,
+        line=dict(color=cfg['color'], width=cfg['width'], dash=cfg['dash']),
+        marker=dict(size=5 if company == 'BioScope' else 3),
+    ))
+
+fig_radar.update_layout(
+    polar=dict(
+        radialaxis=dict(visible=True, range=[0, 10], tickfont=dict(size=9), gridcolor='#ECF0F1'),
+        angularaxis=dict(tickfont=dict(size=12)),
+        bgcolor='white',
+    ),
+    showlegend=True,
+    legend=dict(orientation='h', y=-0.12, font=dict(size=12)),
+    height=460,
+    margin=dict(l=60, r=60, t=20, b=60),
+    paper_bgcolor='white',
+)
+st.plotly_chart(fig_radar, use_container_width=True)
+st.caption(
+    "Eurofins: broad but slow, no welfare/authenticity. "
+    "Neogen: fast but single-analyte kits only. "
+    "Bruker: instruments sold to labs — requires in-house expertise. "
+    "BioScope: only player combining all six dimensions."
+)
