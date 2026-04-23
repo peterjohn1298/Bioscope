@@ -123,8 +123,9 @@ with left:
         legend=dict(orientation='h', y=-0.3, font=dict(size=10)),
         margin=dict(l=0, r=0, t=10, b=80),
         plot_bgcolor='white', paper_bgcolor='white',
+        transition={'duration': 400, 'easing': 'cubic-in-out'},
     )
-    st.plotly_chart(fig_stack, use_container_width=True)
+    st.plotly_chart(fig_stack, use_container_width=True, key="revenue_by_segment")
 
 with right:
     st.subheader("BM1 Direct vs BM2 Licensing")
@@ -142,8 +143,9 @@ with right:
         legend=dict(orientation='h', y=-0.15),
         margin=dict(l=0, r=0, t=10, b=60),
         plot_bgcolor='white', paper_bgcolor='white',
+        transition={'duration': 400, 'easing': 'cubic-in-out'},
     )
-    st.plotly_chart(fig_split, use_container_width=True)
+    st.plotly_chart(fig_split, use_container_width=True, key="bm1_vs_bm2")
 
 # ── Customer table ─────────────────────────────────────────────────────────────
 st.subheader("Customer Count & Revenue per Customer")

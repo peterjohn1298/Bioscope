@@ -129,8 +129,9 @@ fig_compare.update_layout(
     legend=dict(orientation='h', y=-0.12),
     margin=dict(l=0, r=0, t=10, b=60),
     plot_bgcolor='white', paper_bgcolor='white',
+    transition={'duration': 400, 'easing': 'cubic-in-out'},
 )
-st.plotly_chart(fig_compare, use_container_width=True)
+st.plotly_chart(fig_compare, use_container_width=True, key="scenario_compare")
 
 # ── Segment breakdown comparison ───────────────────────────────────────────────
 st.subheader("Y3 Revenue by Segment — All Scenarios")
@@ -154,8 +155,9 @@ fig_seg.update_layout(
     legend=dict(orientation='h', y=-0.2),
     margin=dict(l=0, r=0, t=10, b=80),
     plot_bgcolor='white', paper_bgcolor='white',
+    transition={'duration': 400, 'easing': 'cubic-in-out'},
 )
-st.plotly_chart(fig_seg, use_container_width=True)
+st.plotly_chart(fig_seg, use_container_width=True, key="scenario_by_segment")
 
 # ── Scenario assumptions table ─────────────────────────────────────────────────
 st.subheader("Scenario Assumption Summary")
