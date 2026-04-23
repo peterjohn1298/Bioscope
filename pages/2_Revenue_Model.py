@@ -5,7 +5,6 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 import copy
-import numpy as np
 
 from models.market_model import calc_som
 from data.assumptions import SEGMENTS, PRICING, BM2
@@ -97,80 +96,6 @@ k2.metric("Year 2 Revenue",      f"${som['total']['y2']/1e6:.1f}M")
 k3.metric("Year 3 Revenue",      f"${som['total']['y3']/1e6:.0f}M")
 k4.metric("BM2 Y3 Contribution", f"${som['bm2']['y3']/1e6:.1f}M",
           delta=f"{som['bm2']['y3']/som['total']['y3']*100:.1f}% of Y3" if som['total']['y3'] > 0 else "—")
-
-st.divider()
-
-# ── Live Penetration Explorer (Plotly client-side slider — instant, no reload) ─
-st.subheader("Live Revenue Explorer")
-st.caption("Drag the slider **inside the chart** — bars update instantly without a page reload. "
-           "Reflects current pricing & BM2 settings from the sidebar.")
-
-_N   = 60
-_mul = np.linspace(0.25, 3.0, _N)
-_bi  = int(round((_N - 1) * (1.0 - 0.25) / (3.0 - 0.25)))   # index closest to 1.0×
-_sn  = [s['name'] for s in SEGMENTS] + ['BM2 Licensed Labs']
-
-_frames, _steps = [], []
-for _i, _m in enumerate(_mul):
-    _ss = copy.deepcopy(SEGMENTS)
-    for _s in _ss:
-        _s['pen_y1'] = min(1.0, _s['pen_y1'] * _m)
-        _s['pen_y2'] = min(1.0, _s['pen_y2'] * _m)
-        _s['pen_y3'] = min(1.0, _s['pen_y3'] * _m)
-    _r  = calc_som(_ss, custom_pricing, None, custom_bm2)
-    _y1 = [s['som_y1'] / 1e6 for s in _r['segments']] + [_r['bm2']['y1'] / 1e6]
-    _y2 = [s['som_y2'] / 1e6 for s in _r['segments']] + [_r['bm2']['y2'] / 1e6]
-    _y3 = [s['som_y3'] / 1e6 for s in _r['segments']] + [_r['bm2']['y3'] / 1e6]
-    _fn = str(_i)
-    _frames.append(go.Frame(
-        name=_fn,
-        data=[go.Bar(x=['Year 1', 'Year 2', 'Year 3'],
-                     y=[_y1[j], _y2[j], _y3[j]],
-                     name=_sn[j],
-                     marker_color=SEG_COLORS[j % len(SEG_COLORS)],
-                     showlegend=(_i == _bi))
-              for j in range(len(_sn))],
-        layout=go.Layout(
-            title_text=f"Y3 Total: ${sum(_y3):.0f}M   ·   {_m:.2f}× penetration multiplier",
-        ),
-    ))
-    _steps.append({
-        'method': 'animate',
-        'label': f'{_m:.2f}×',
-        'args': [[_fn], {'frame': {'duration': 0, 'redraw': True},
-                         'mode': 'immediate', 'transition': {'duration': 0}}],
-    })
-
-_bd = _frames[_bi].data
-_base_y3_total = sum(t.y[2] for t in _bd)
-fig_live = go.Figure(data=_bd, frames=_frames)
-fig_live.update_layout(
-    title_text=f"Y3 Total: ${_base_y3_total:.0f}M   ·   1.00× penetration multiplier",
-    title_font=dict(size=14, color=BLUE),
-    barmode='stack', height=450,
-    yaxis=dict(title='$M', showgrid=True, gridcolor='#ECF0F1'),
-    legend=dict(orientation='h', y=-0.30, font=dict(size=10)),
-    margin=dict(l=0, r=0, t=50, b=140),
-    plot_bgcolor='white', paper_bgcolor='white',
-    updatemenus=[],
-    sliders=[{
-        'active': _bi,
-        'steps': _steps,
-        'currentvalue': {
-            'prefix': 'Penetration Multiplier: ',
-            'visible': True,
-            'xanchor': 'center',
-            'font': {'size': 12, 'color': BLUE},
-        },
-        'pad': {'b': 10, 't': 55},
-        'len': 0.90, 'x': 0.05, 'y': 0,
-        'bgcolor': '#ECF0F1',
-        'activebgcolor': GREEN,
-        'bordercolor': '#BDC3C7',
-        'tickcolor': 'rgba(0,0,0,0)',
-    }],
-)
-st.plotly_chart(fig_live, use_container_width=True, key="live_explorer")
 
 st.divider()
 
