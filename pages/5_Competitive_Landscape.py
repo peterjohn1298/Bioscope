@@ -12,90 +12,172 @@ BLUE   = "#1B4F72"
 RED    = "#E74C3C"
 ORANGE = "#E67E22"
 PURPLE = "#9B59B6"
-GREY   = "#95A5A6"
+GREY   = "#7F8C8D"
 
 st.title("⚔️ Competitive Landscape")
-st.markdown("BioScope occupies a white space that no existing player serves — fast, comprehensive, and certifiable.")
+st.markdown("No existing player combines **speed**, **breadth**, and **certification** in one service. That is BioScope's white space.")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 1. QUADRANT MAP — clean 2×2 with only relevant players
+# 1. ANIMATED POSITIONING MAP
 # ═══════════════════════════════════════════════════════════════════════════════
-st.subheader("Where Does Everyone Sit?")
+st.subheader("Market Positioning Map")
+st.caption("Click **▶ Reveal** to walk through the landscape — BioScope enters last.")
 
-# Only the 6 most investor-relevant competitors + BioScope
-# x = turnaround speed (1=weeks, 10=minutes)
-# y = scope of insight (1=one question answered, 10=full certification)
-players = [
-    {'name': 'BioScope',       'x': 9.5, 'y': 9.8, 'color': GREEN,  'size': 22, 'symbol': 'star',   'label_pos': 'middle right'},
-    {'name': 'Eurofins / SGS', 'x': 1.8, 'y': 6.5, 'color': RED,    'size': 14, 'symbol': 'circle', 'label_pos': 'top center'},
-    {'name': 'Neogen',         'x': 7.5, 'y': 2.0, 'color': ORANGE, 'size': 12, 'symbol': 'circle', 'label_pos': 'top center'},
-    {'name': 'Bruker',         'x': 3.5, 'y': 6.0, 'color': PURPLE, 'size': 12, 'symbol': 'circle', 'label_pos': 'top center'},
-    {'name': 'Bureau Veritas', 'x': 1.5, 'y': 3.5, 'color': GREY,   'size': 12, 'symbol': 'circle', 'label_pos': 'bottom center'},
-    {'name': 'Clear Labs',     'x': 5.0, 'y': 2.5, 'color': '#3498DB', 'size': 10, 'symbol': 'circle', 'label_pos': 'top center'},
+non_bio = [
+    {'name': 'Eurofins / SGS', 'x': 1.8, 'y': 6.8, 'color': RED,    'size': 16, 'tpos': 'top center'},
+    {'name': 'Neogen',         'x': 7.8, 'y': 2.0, 'color': ORANGE, 'size': 14, 'tpos': 'top center'},
+    {'name': 'Bruker',         'x': 3.5, 'y': 6.2, 'color': PURPLE, 'size': 13, 'tpos': 'top center'},
+    {'name': 'Bureau Veritas', 'x': 1.6, 'y': 3.2, 'color': GREY,   'size': 13, 'tpos': 'bottom center'},
+    {'name': 'Clear Labs',     'x': 5.2, 'y': 2.6, 'color': BLUE,   'size': 11, 'tpos': 'top center'},
 ]
 
-fig_q = go.Figure()
+fig = go.Figure()
 
-# Quadrant background shading
-fig_q.add_shape(type='rect', x0=0, y0=5, x1=5, y1=10,
-                fillcolor='rgba(231,76,60,0.05)', line=dict(width=0))
-fig_q.add_shape(type='rect', x0=5, y0=5, x1=10, y1=10,
-                fillcolor='rgba(46,204,113,0.08)', line=dict(width=0))
-fig_q.add_shape(type='rect', x0=0, y0=0, x1=5, y1=5,
-                fillcolor='rgba(149,165,166,0.05)', line=dict(width=0))
-fig_q.add_shape(type='rect', x0=5, y0=0, x1=10, y1=5,
-                fillcolor='rgba(230,126,34,0.05)', line=dict(width=0))
+# ── Quadrant backgrounds ───────────────────────────────────────────────────────
+fig.add_shape(type='rect', x0=0, y0=5, x1=5, y1=10,
+              fillcolor='rgba(231,76,60,0.07)', line=dict(width=0), layer='below')
+fig.add_shape(type='rect', x0=5, y0=5, x1=10, y1=10,
+              fillcolor='rgba(46,204,113,0.13)', line=dict(width=0), layer='below')
+fig.add_shape(type='rect', x0=0, y0=0, x1=5,  y1=5,
+              fillcolor='rgba(127,140,141,0.07)', line=dict(width=0), layer='below')
+fig.add_shape(type='rect', x0=5, y0=0, x1=10, y1=5,
+              fillcolor='rgba(230,126,34,0.07)', line=dict(width=0), layer='below')
 
-# Quadrant labels
-fig_q.add_annotation(x=2.5, y=9.3, text="<b>Broad but Slow</b><br><span style='font-size:10px'>Multi-week turnaround</span>",
-                     showarrow=False, font=dict(size=11, color='#AAB7B8'), align='center')
-fig_q.add_annotation(x=7.5, y=9.3, text="<b>★ Integrated Platform</b><br><span style='font-size:10px'>BioScope's white space</span>",
-                     showarrow=False, font=dict(size=11, color=GREEN), align='center')
-fig_q.add_annotation(x=2.5, y=0.8, text="<b>Narrow & Slow</b>",
-                     showarrow=False, font=dict(size=11, color='#AAB7B8'), align='center')
-fig_q.add_annotation(x=7.5, y=0.8, text="<b>Fast but One Question</b>",
-                     showarrow=False, font=dict(size=11, color='#AAB7B8'), align='center')
+# ── Divider lines ──────────────────────────────────────────────────────────────
+fig.add_hline(y=5, line_dash='dash', line_color='#BDC3C7', line_width=1.5)
+fig.add_vline(x=5, line_dash='dash', line_color='#BDC3C7', line_width=1.5)
 
-# Divider lines
-fig_q.add_hline(y=5, line_dash='dash', line_color='#D5D8DC', line_width=1)
-fig_q.add_vline(x=5, line_dash='dash', line_color='#D5D8DC', line_width=1)
+# ── Quadrant labels — bold, high-contrast ─────────────────────────────────────
+quadrant_labels = [
+    dict(x=2.5,  y=9.6,  text="<b>Broad Testing,<br>Slow Delivery</b>",       color='#C0392B', bg='rgba(255,255,255,0.9)'),
+    dict(x=7.5,  y=9.6,  text="<b>Full Certification<br>Platform</b>",         color=GREEN,     bg='rgba(46,204,113,0.15)'),
+    dict(x=2.5,  y=0.5,  text="<b>Process Auditing<br>Only</b>",               color='#707B7C', bg='rgba(255,255,255,0.9)'),
+    dict(x=7.5,  y=0.5,  text="<b>Rapid, Single-<br>Purpose Kits</b>",         color='#D35400', bg='rgba(255,255,255,0.9)'),
+]
+for q in quadrant_labels:
+    fig.add_annotation(
+        x=q['x'], y=q['y'], text=q['text'],
+        showarrow=False,
+        font=dict(size=13, color=q['color']),
+        bgcolor=q['bg'],
+        bordercolor=q['color'],
+        borderwidth=1.5,
+        borderpad=6,
+        align='center',
+    )
 
-# Plot each player
-for p in players:
-    is_bio = p['name'] == 'BioScope'
-    fig_q.add_trace(go.Scatter(
-        x=[p['x']], y=[p['y']],
-        mode='markers+text',
-        marker=dict(
-            size=p['size'],
-            color=p['color'],
-            symbol=p['symbol'],
-            line=dict(width=2 if is_bio else 1, color='white'),
-        ),
-        text=[f"<b>{p['name']}</b>" if is_bio else p['name']],
-        textposition=p['label_pos'],
-        textfont=dict(size=13 if is_bio else 11, color=p['color'] if is_bio else '#2C3E50'),
-        showlegend=False,
-        hovertemplate=f"<b>{p['name']}</b><extra></extra>",
+# ── 3 animation traces: competitors | BioScope glow ring | BioScope star ──────
+fig.add_trace(go.Scatter(x=[], y=[], mode='markers+text', showlegend=False, name='competitors'))
+fig.add_trace(go.Scatter(x=[], y=[], mode='markers',      showlegend=False, name='glow'))
+fig.add_trace(go.Scatter(x=[], y=[], mode='markers+text', showlegend=False, name='bioscope'))
+
+# ── Build animation frames ────────────────────────────────────────────────────
+frames = []
+
+# Frames 0-4: competitors appear one by one
+for i in range(len(non_bio) + 1):
+    shown = non_bio[:i]
+    frames.append(go.Frame(
+        name=str(i),
+        traces=[0, 1, 2],
+        data=[
+            go.Scatter(
+                x=[p['x'] for p in shown],
+                y=[p['y'] for p in shown],
+                mode='markers+text',
+                marker=dict(
+                    size=[p['size'] for p in shown],
+                    color=[p['color'] for p in shown],
+                    line=dict(width=1.5, color='white'),
+                ),
+                text=[p['name'] for p in shown],
+                textposition=[p['tpos'] for p in shown],
+                textfont=dict(size=11, color='#2C3E50'),
+            ),
+            go.Scatter(x=[], y=[], mode='markers'),
+            go.Scatter(x=[], y=[], mode='markers+text'),
+        ],
     ))
 
-fig_q.update_layout(
-    height=430,
-    xaxis=dict(title="← Days / Weeks &nbsp;&nbsp;&nbsp;&nbsp; Turnaround Speed &nbsp;&nbsp;&nbsp;&nbsp; Minutes →",
-               range=[0, 10], showgrid=False, zeroline=False,
-               tickvals=[], ticktext=[]),
-    yaxis=dict(title="← Single Test &nbsp;&nbsp;&nbsp;&nbsp; Scope of Insight &nbsp;&nbsp;&nbsp;&nbsp; Full Certification →",
-               range=[0, 10], showgrid=False, zeroline=False,
-               tickvals=[], ticktext=[]),
-    margin=dict(l=80, r=20, t=20, b=60),
+# Final frame: all competitors + BioScope glow + BioScope star
+frames.append(go.Frame(
+    name='bioscope',
+    traces=[0, 1, 2],
+    data=[
+        go.Scatter(
+            x=[p['x'] for p in non_bio],
+            y=[p['y'] for p in non_bio],
+            mode='markers+text',
+            marker=dict(
+                size=[p['size'] for p in non_bio],
+                color=[p['color'] for p in non_bio],
+                line=dict(width=1.5, color='white'),
+            ),
+            text=[p['name'] for p in non_bio],
+            textposition=[p['tpos'] for p in non_bio],
+            textfont=dict(size=11, color='#2C3E50'),
+        ),
+        go.Scatter(
+            x=[9.5], y=[9.8], mode='markers',
+            marker=dict(size=70, color='rgba(46,204,113,0.18)', symbol='circle'),
+        ),
+        go.Scatter(
+            x=[9.5], y=[9.8], mode='markers+text',
+            marker=dict(
+                size=26, color=GREEN, symbol='star',
+                line=dict(width=2.5, color='white'),
+            ),
+            text=['<b>★ BioScope</b>'],
+            textposition='middle right',
+            textfont=dict(size=15, color=GREEN, family='Arial Black'),
+        ),
+    ],
+))
+
+fig.frames = frames
+
+# ── Play button ───────────────────────────────────────────────────────────────
+fig.update_layout(
+    updatemenus=[{
+        'type': 'buttons',
+        'showactive': False,
+        'x': 0.5, 'xanchor': 'center',
+        'y': -0.10, 'yanchor': 'top',
+        'buttons': [{
+            'label': '▶  Reveal',
+            'method': 'animate',
+            'args': [None, {
+                'frame': {'duration': 600, 'redraw': True},
+                'transition': {'duration': 400, 'easing': 'cubic-in-out'},
+                'fromcurrent': True,
+                'mode': 'immediate',
+            }],
+        }],
+        'bgcolor': GREEN,
+        'font': {'color': 'white', 'size': 13},
+        'bordercolor': GREEN,
+        'borderwidth': 0,
+        'pad': {'l': 16, 'r': 16, 't': 8, 'b': 8},
+    }],
+    height=500,
+    xaxis=dict(
+        title=dict(text="← Turnaround: Weeks / Days                                                     Minutes →", font=dict(size=12, color='#555')),
+        range=[0, 10], showgrid=False, zeroline=False, tickvals=[], ticktext=[],
+    ),
+    yaxis=dict(
+        title=dict(text="← Single Test                                          Full Certification →", font=dict(size=12, color='#555')),
+        range=[0, 10], showgrid=False, zeroline=False, tickvals=[], ticktext=[],
+    ),
+    margin=dict(l=80, r=30, t=30, b=80),
     plot_bgcolor='white', paper_bgcolor='white',
 )
-st.plotly_chart(fig_q, use_container_width=True)
+
+st.plotly_chart(fig, use_container_width=True)
 
 st.divider()
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 2. RADAR CHART — capability profile side by side with clean description
+# 2. RADAR CHART + COMPETITOR SUMMARIES
 # ═══════════════════════════════════════════════════════════════════════════════
 st.subheader("Capability Profile")
 
@@ -110,14 +192,12 @@ with left:
         'Ease of Use',
         'Cost per Insight',
     ]
-
     radar_companies = {
         'BioScope':     {'scores': [10, 10, 10, 10, 10, 9], 'color': GREEN,  'dash': 'solid', 'width': 4},
         'Eurofins/SGS': {'scores': [2,  7,  2,  4,  3,  4], 'color': RED,    'dash': 'dot',   'width': 2},
         'Neogen':       {'scores': [8,  2,  1,  2,  8,  7], 'color': ORANGE, 'dash': 'dot',   'width': 2},
         'Bruker':       {'scores': [4,  7,  3,  3,  2,  3], 'color': PURPLE, 'dash': 'dot',   'width': 2},
     }
-
     fig_r = go.Figure()
     for company, cfg in radar_companies.items():
         scores = cfg['scores'] + [cfg['scores'][0]]
@@ -129,7 +209,6 @@ with left:
             name=company,
             line=dict(color=cfg['color'], width=cfg['width'], dash=cfg['dash']),
         ))
-
     fig_r.update_layout(
         polar=dict(
             radialaxis=dict(visible=False, range=[0, 10]),
@@ -146,14 +225,15 @@ with left:
 with right:
     st.markdown("<br><br>", unsafe_allow_html=True)
     insights = [
-        (GREEN,  "BioScope",     "Occupies the top-right on every axis — the only player that is simultaneously fast, broad, and certifiable."),
-        (RED,    "Eurofins/SGS", "Broad test menu but slow (days–weeks), per-test billing, no welfare or origin capability."),
-        (ORANGE, "Neogen",       "Fast kits but each kit answers exactly one question. Cannot bundle into a certification."),
-        (PURPLE, "Bruker",       "Technically capable instruments — but sold to labs. Requires in-house scientists and separate sample prep."),
+        (GREEN,  "BioScope",     "The only player that scores high across every axis — fast, comprehensive, and certifiable in a single scan."),
+        (RED,    "Eurofins/SGS", "Deep test menu but multi-week turnaround, per-test billing, and no welfare or origin capability."),
+        (ORANGE, "Neogen",       "Fast kits, but each one answers a single question. Cannot bundle into a certification badge."),
+        (PURPLE, "Bruker",       "Technically capable instruments — but requires a trained scientist and hours of sample prep before any result."),
     ]
     for color, name, text in insights:
         st.markdown(f"""
-        <div style="margin-bottom:14px;padding:10px 14px;border-left:4px solid {color};background:#FAFAFA;border-radius:0 6px 6px 0">
+        <div style="margin-bottom:14px;padding:10px 14px;border-left:4px solid {color};
+                    background:#FAFAFA;border-radius:0 6px 6px 0">
             <div style="font-weight:700;color:{color};font-size:13px">{name}</div>
             <div style="font-size:12px;color:#555;margin-top:3px">{text}</div>
         </div>""", unsafe_allow_html=True)
@@ -161,44 +241,24 @@ with right:
 st.divider()
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 3. CAPABILITY GRID — clean ✅ / ⚠️ / ❌ matrix, no long text
+# 3. CAPABILITY GRID
 # ═══════════════════════════════════════════════════════════════════════════════
 st.subheader("Who Can Do What?")
 
-capabilities = [
-    "Multi-residue chemical panel",
-    "Animal welfare biomarkers",
-    "Species / fraud authentication",
-    "Geographic origin tracing",
-    "Results in minutes",
-    "Single scan — no fragmentation",
-    "Investor-grade certification badge",
-]
-
 grid = {
-    "Capability":        capabilities,
-    "BioScope ★":        ["✅", "✅", "✅", "✅", "✅", "✅", "✅"],
-    "Eurofins / SGS":    ["✅", "⚠️", "⚠️", "⚠️", "❌", "❌", "❌"],
-    "Neogen":            ["⚠️", "❌", "❌", "❌", "✅", "❌", "❌"],
-    "Bruker":            ["✅", "⚠️", "✅", "⚠️", "❌", "❌", "❌"],
-    "Bureau Veritas":    ["❌", "❌", "❌", "❌", "❌", "❌", "⚠️"],
-    "Clear Labs":        ["❌", "❌", "✅", "❌", "⚠️", "❌", "❌"],
+    "Capability":            ["Multi-residue chemical panel", "Animal welfare biomarkers", "Species / fraud authentication", "Geographic origin tracing", "Results in minutes", "Single scan — no fragmentation", "Investor-grade certification badge"],
+    "BioScope ★":            ["✅", "✅", "✅", "✅", "✅", "✅", "✅"],
+    "Eurofins / SGS":        ["✅", "⚠️", "⚠️", "⚠️", "❌", "❌", "❌"],
+    "Neogen":                ["⚠️", "❌", "❌", "❌", "✅", "❌", "❌"],
+    "Bruker":                ["✅", "⚠️", "✅", "⚠️", "❌", "❌", "❌"],
+    "Bureau Veritas":        ["❌", "❌", "❌", "❌", "❌", "❌", "⚠️"],
+    "Clear Labs":            ["❌", "❌", "✅", "❌", "⚠️", "❌", "❌"],
 }
 
-df_grid = pd.DataFrame(grid)
-
 st.dataframe(
-    df_grid,
+    pd.DataFrame(grid),
     use_container_width=True,
     hide_index=True,
-    column_config={
-        "Capability":     st.column_config.TextColumn(width="medium"),
-        "BioScope ★":     st.column_config.TextColumn(width="small"),
-        "Eurofins / SGS": st.column_config.TextColumn(width="small"),
-        "Neogen":         st.column_config.TextColumn(width="small"),
-        "Bruker":         st.column_config.TextColumn(width="small"),
-        "Bureau Veritas": st.column_config.TextColumn(width="small"),
-        "Clear Labs":     st.column_config.TextColumn(width="small"),
-    }
+    column_config={col: st.column_config.TextColumn(width="small") for col in grid if col != "Capability"},
 )
 st.caption("✅ Full capability  ·  ⚠️ Partial / requires workaround  ·  ❌ Not offered")
