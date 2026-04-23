@@ -11,6 +11,17 @@ from data.assumptions import SEGMENTS, PRICING, BM2
 
 st.set_page_config(page_title="Scenario Analysis — BioScope", layout="wide")
 
+st.markdown("""
+<style>
+[data-testid="stDataFrame"] th,
+[data-testid="stDataFrame"] th div,
+[data-testid="stDataFrame"] th span,
+.dvn-scroller .col-header-cell,
+.dvn-scroller .col-header-cell span { color: #000000 !important; font-weight: 700 !important; }
+</style>
+""", unsafe_allow_html=True)
+
+
 GREEN  = "#2ECC71"; BLUE = "#1B4F72"; RED = "#E74C3C"; ORANGE = "#E67E22"
 
 st.title("🔀 Scenario Analysis")

@@ -24,6 +24,7 @@ ORANGE = "#E67E22"
 
 st.markdown("""
 <style>
+    /* ── Layout cards ── */
     .metric-card {
         background: white;
         border-radius: 10px;
@@ -36,6 +37,13 @@ st.markdown("""
     .metric-sub   { font-size: 12px; color: #95A5A6; }
     .section-header { font-size: 20px; font-weight: 700; color: #1B4F72; margin: 24px 0 8px 0; }
     .tag { display:inline-block; background:#EBF5FB; color:#1B4F72; border-radius:4px; padding:2px 8px; font-size:11px; font-weight:600; }
+
+    /* ── Black column headers across ALL dataframes ── */
+    [data-testid="stDataFrame"] th,
+    [data-testid="stDataFrame"] th div,
+    [data-testid="stDataFrame"] th span,
+    .dvn-scroller .col-header-cell,
+    .dvn-scroller .col-header-cell span { color: #000000 !important; font-weight: 700 !important; }
 </style>
 """, unsafe_allow_html=True)
 
