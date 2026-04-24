@@ -8,21 +8,10 @@ import copy
 
 from models.market_model import calc_scenario, calc_som, SCENARIOS
 from data.assumptions import SEGMENTS, PRICING, BM2
+from utils.theme import apply_theme, FOREST, MINT, AMBER, CHARCOAL, ROSE, VIOLET, chart_layout
 
 st.set_page_config(page_title="Scenario Analysis — BioScope", layout="wide")
-
-st.markdown("""
-<style>
-[data-testid="stDataFrame"] th,
-[data-testid="stDataFrame"] th div,
-[data-testid="stDataFrame"] th span,
-.dvn-scroller .col-header-cell,
-.dvn-scroller .col-header-cell span { color: #000000 !important; font-weight: 700 !important; }
-</style>
-""", unsafe_allow_html=True)
-
-
-GREEN  = "#2ECC71"; BLUE = "#1B4F72"; RED = "#E74C3C"; ORANGE = "#E67E22"
+apply_theme()
 
 st.title("🔀 Scenario Analysis")
 st.markdown("Compare Bear / Base / Bull cases side-by-side — or build a fully custom scenario.")
@@ -88,18 +77,18 @@ def scenario_card(col, label, color, som_result, note=""):
     y1 = som_result['total']['y1']
     y2 = som_result['total']['y2']
     col.markdown(f"""
-    <div style="background:white;border-radius:10px;padding:18px;border-top:5px solid {color};
-                box-shadow:0 2px 8px rgba(0,0,0,0.08);text-align:center;">
-        <div style="font-size:12px;color:#7F8C8D;font-weight:700;text-transform:uppercase">{label}</div>
-        <div style="font-size:30px;font-weight:800;color:{color};margin:6px 0">${y3/1e6:.0f}M</div>
-        <div style="font-size:11px;color:#95A5A6">Y1: ${y1/1e6:.1f}M &nbsp;|&nbsp; Y2: ${y2/1e6:.1f}M</div>
-        <div style="font-size:11px;color:#7F8C8D;margin-top:4px">{note}</div>
+    <div style="background:white;border-radius:12px;padding:20px;border-top:5px solid {color};
+                box-shadow:0 2px 16px rgba(45,106,79,0.10),0 1px 4px rgba(0,0,0,0.04);text-align:center;">
+        <div style="font-size:10px;color:#6B7280;font-weight:700;letter-spacing:1.2px;text-transform:uppercase">{label}</div>
+        <div style="font-size:30px;font-weight:800;color:{color};margin:8px 0">${y3/1e6:.0f}M</div>
+        <div style="font-size:11px;color:#9CA3AF">Y1: ${y1/1e6:.1f}M &nbsp;|&nbsp; Y2: ${y2/1e6:.1f}M</div>
+        <div style="font-size:11px;color:#6B7280;margin-top:4px">{note}</div>
     </div>""", unsafe_allow_html=True)
 
-scenario_card(c_bear, "Bear (Conservative)", RED,   bear, "50% pen. / base pricing")
-scenario_card(c_base, "Base Case",           BLUE,  base, "Excel model assumptions")
-scenario_card(c_bull, "Bull (Optimistic)",   GREEN, bull, "1.75× pen. / +10% pricing")
-scenario_card(c_cust, "Custom Scenario",     ORANGE, custom, f"Pen mult {pen_mult:.2f}× / Price {price_mult:.2f}×")
+scenario_card(c_bear, "Bear (Conservative)", ROSE,   bear,   "50% pen. / base pricing")
+scenario_card(c_base, "Base Case",           FOREST, base,   "Excel model assumptions")
+scenario_card(c_bull, "Bull (Optimistic)",   MINT,   bull,   "1.75× pen. / +10% pricing")
+scenario_card(c_cust, "Custom Scenario",     AMBER,  custom, f"Pen mult {pen_mult:.2f}× / Price {price_mult:.2f}×")
 
 st.divider()
 
@@ -107,10 +96,10 @@ st.divider()
 st.subheader("Revenue Comparison — Year 1 / 2 / 3")
 years = ['Year 1', 'Year 2', 'Year 3']
 scenarios_data = [
-    ('Bear',   RED,    bear),
-    ('Base',   BLUE,   base),
-    ('Bull',   GREEN,  bull),
-    ('Custom', ORANGE, custom),
+    ('Bear',   ROSE,   bear),
+    ('Base',   FOREST, base),
+    ('Bull',   MINT,   bull),
+    ('Custom', AMBER,  custom),
 ]
 
 fig_compare = go.Figure()
@@ -120,24 +109,23 @@ for label, color, sc in scenarios_data:
         x=years,
         y=[sc['total']['y1']/1e6, sc['total']['y2']/1e6, sc['total']['y3']/1e6],
         marker_color=color,
+        marker_line=dict(width=0),
         text=[f"${v:.0f}M" for v in [sc['total']['y1']/1e6, sc['total']['y2']/1e6, sc['total']['y3']/1e6]],
         textposition='outside',
     ))
-fig_compare.update_layout(
+fig_compare.update_layout(**chart_layout(
     barmode='group', height=420,
-    yaxis=dict(title='Revenue ($M)', showgrid=True, gridcolor='#ECF0F1'),
+    yaxis=dict(title='Revenue ($M)', showgrid=True, gridcolor='#E8F5EE'),
     legend=dict(orientation='h', y=-0.12),
     margin=dict(l=0, r=0, t=10, b=60),
-    plot_bgcolor='white', paper_bgcolor='white',
-    transition={'duration': 400, 'easing': 'cubic-in-out'},
-)
+))
 st.plotly_chart(fig_compare, use_container_width=True, key="scenario_compare")
 
 # ── Segment breakdown comparison ───────────────────────────────────────────────
 st.subheader("Y3 Revenue by Segment — All Scenarios")
 
 seg_names_all = [s['name'] for s in base['segments']] + ['BM2 Licensed Labs']
-sc_list = [('Bear', RED, bear), ('Base', BLUE, base), ('Bull', GREEN, bull), ('Custom', ORANGE, custom)]
+sc_list = [('Bear', ROSE, bear), ('Base', FOREST, base), ('Bull', MINT, bull), ('Custom', AMBER, custom)]
 
 fig_seg = go.Figure()
 for sc_label, sc_color, sc_result in sc_list:
@@ -147,16 +135,15 @@ for sc_label, sc_color, sc_result in sc_list:
         x=seg_names_all,
         y=y3_by_seg,
         marker_color=sc_color,
+        marker_line=dict(width=0),
     ))
-fig_seg.update_layout(
+fig_seg.update_layout(**chart_layout(
     barmode='group', height=400,
-    yaxis=dict(title='Y3 Revenue ($M)', showgrid=True, gridcolor='#ECF0F1'),
+    yaxis=dict(title='Y3 Revenue ($M)', showgrid=True, gridcolor='#E8F5EE'),
     xaxis=dict(tickangle=-15),
     legend=dict(orientation='h', y=-0.2),
     margin=dict(l=0, r=0, t=10, b=80),
-    plot_bgcolor='white', paper_bgcolor='white',
-    transition={'duration': 400, 'easing': 'cubic-in-out'},
-)
+))
 st.plotly_chart(fig_seg, use_container_width=True, key="scenario_by_segment")
 
 # ── Scenario assumptions table ─────────────────────────────────────────────────
@@ -181,4 +168,3 @@ rows.append({
     'Y3 Revenue': f"${custom['total']['y3']/1e6:.0f}M",
 })
 st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
-

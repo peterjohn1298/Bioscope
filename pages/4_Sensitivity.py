@@ -5,24 +5,14 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 import copy
+import numpy as np
 
 from models.market_model import calc_som, sensitivity_tornado
 from data.assumptions import SEGMENTS, PRICING, BM2
+from utils.theme import apply_theme, FOREST, MINT, AMBER, CHARCOAL, ROSE, chart_layout
 
 st.set_page_config(page_title="Sensitivity Analysis — BioScope", layout="wide")
-
-st.markdown("""
-<style>
-[data-testid="stDataFrame"] th,
-[data-testid="stDataFrame"] th div,
-[data-testid="stDataFrame"] th span,
-.dvn-scroller .col-header-cell,
-.dvn-scroller .col-header-cell span { color: #000000 !important; font-weight: 700 !important; }
-</style>
-""", unsafe_allow_html=True)
-
-
-BLUE = "#1B4F72"; GREEN = "#2ECC71"; RED = "#E74C3C"; ORANGE = "#E67E22"
+apply_theme()
 
 st.title("🎯 Sensitivity Analysis")
 st.markdown(
@@ -51,39 +41,38 @@ st.divider()
 # ── Tornado chart ──────────────────────────────────────────────────────────────
 st.subheader("Tornado Chart — Y3 SOM Impact (±20% on each assumption)")
 
-labels = [t['label'] for t in tornado]
-upsides = [t['upside'] / 1e6 for t in tornado]
-downsides = [t['downside'] / 1e6 for t in tornado]
+labels   = [t['label']        for t in tornado]
+upsides  = [t['upside'] / 1e6  for t in tornado]
+downsides= [t['downside'] / 1e6 for t in tornado]
 
 fig = go.Figure()
 fig.add_trace(go.Bar(
     name='Upside (+20%)',
-    y=labels,
-    x=upsides,
+    y=labels, x=upsides,
     orientation='h',
-    marker_color=GREEN,
+    marker_color=MINT,
+    marker_line=dict(width=0),
     text=[f"+${v:.1f}M" for v in upsides],
     textposition='outside',
 ))
 fig.add_trace(go.Bar(
     name='Downside (−20%)',
-    y=labels,
-    x=downsides,
+    y=labels, x=downsides,
     orientation='h',
-    marker_color=RED,
+    marker_color=ROSE,
+    marker_line=dict(width=0),
     text=[f"−${abs(v):.1f}M" for v in downsides],
     textposition='outside',
 ))
-fig.add_vline(x=0, line_width=2, line_color=BLUE)
-fig.update_layout(
+fig.add_vline(x=0, line_width=2, line_color=FOREST)
+fig.update_layout(**chart_layout(
     barmode='overlay',
     height=520,
     margin=dict(l=0, r=120, t=20, b=10),
-    xaxis=dict(title='Change in Y3 SOM ($M)', showgrid=True, gridcolor='#ECF0F1', zeroline=True),
-    yaxis=dict(autorange='reversed'),
+    xaxis=dict(title='Change in Y3 SOM ($M)', showgrid=True, gridcolor='#E8F5EE', zeroline=True),
+    yaxis=dict(autorange='reversed', showgrid=False),
     legend=dict(orientation='h', y=-0.08),
-    plot_bgcolor='white', paper_bgcolor='white',
-)
+))
 st.plotly_chart(fig, use_container_width=True)
 
 # ── Tornado data table ─────────────────────────────────────────────────────────
@@ -106,20 +95,19 @@ st.subheader("Single-Variable Explorer")
 st.markdown("Pick any single assumption and sweep it across a range to see the impact curve.")
 
 sweep_options = {
-    'Brands penetration (Y3)':     ('seg_pen', 'brands', 0.001, 0.15),
+    'Brands penetration (Y3)':     ('seg_pen', 'brands',     0.001, 0.15),
     'Processors penetration (Y3)': ('seg_pen', 'processors', 0.001, 0.15),
-    'Retailers penetration (Y3)':  ('seg_pen', 'retailers', 0.001, 0.10),
-    'Exporters penetration (Y3)':  ('seg_pen', 'exporters', 0.001, 0.15),
-    'Tier 1 price ($/sample)':     ('price', 'tier1', 200, 1500),
-    'Tier 1+2 price ($/sample)':   ('price', 'tier12', 400, 2000),
-    'Tier 1+2+3 price ($/sample)': ('price', 'tier123', 600, 3000),
-    'BM2 labs (Y3)':               ('bm2', 'labs_y3', 0, 50),
+    'Retailers penetration (Y3)':  ('seg_pen', 'retailers',  0.001, 0.10),
+    'Exporters penetration (Y3)':  ('seg_pen', 'exporters',  0.001, 0.15),
+    'Tier 1 price ($/sample)':     ('price',   'tier1',      200,   1500),
+    'Tier 1+2 price ($/sample)':   ('price',   'tier12',     400,   2000),
+    'Tier 1+2+3 price ($/sample)': ('price',   'tier123',    600,   3000),
+    'BM2 labs (Y3)':               ('bm2',     'labs_y3',    0,     50),
 }
 
 selected = st.selectbox("Select assumption to sweep", list(sweep_options.keys()))
 sweep_type, sweep_key, sweep_min, sweep_max = sweep_options[selected]
 
-import numpy as np
 sweep_values = np.linspace(sweep_min, sweep_max, 40)
 som_values = []
 
@@ -146,7 +134,6 @@ for v in sweep_values:
     result = calc_som(segs, prc, None, bm2)
     som_values.append(result['total']['y3'] / 1e6)
 
-# Get base value
 if sweep_type == 'seg_pen':
     base_val = next(s['pen_y3'] for s in SEGMENTS if s['key'] == sweep_key)
 elif sweep_type == 'price':
@@ -157,17 +144,16 @@ elif sweep_type == 'bm2':
 fig_sweep = go.Figure()
 fig_sweep.add_trace(go.Scatter(
     x=list(sweep_values), y=som_values,
-    mode='lines', line=dict(color=BLUE, width=3),
-    fill='tozeroy', fillcolor='rgba(27,79,114,0.1)',
+    mode='lines', line=dict(color=FOREST, width=3),
+    fill='tozeroy', fillcolor='rgba(45,106,79,0.10)',
     name='Y3 SOM',
 ))
-fig_sweep.add_vline(x=base_val, line_dash='dash', line_color=ORANGE, line_width=2,
+fig_sweep.add_vline(x=base_val, line_dash='dash', line_color=AMBER, line_width=2,
                     annotation_text=f"Base: {base_val}", annotation_position="top right")
-fig_sweep.add_hline(y=base_y3/1e6, line_dash='dot', line_color='#95A5A6', line_width=1)
-fig_sweep.update_layout(
+fig_sweep.add_hline(y=base_y3/1e6, line_dash='dot', line_color='#9CA3AF', line_width=1)
+fig_sweep.update_layout(**chart_layout(
     height=320, margin=dict(l=0, r=0, t=20, b=10),
-    xaxis=dict(title=selected, showgrid=True),
-    yaxis=dict(title='Y3 SOM ($M)', showgrid=True),
-    plot_bgcolor='white', paper_bgcolor='white',
-)
+    xaxis=dict(title=selected, showgrid=True, gridcolor='#E8F5EE'),
+    yaxis=dict(title='Y3 SOM ($M)', showgrid=True, gridcolor='#E8F5EE'),
+))
 st.plotly_chart(fig_sweep, use_container_width=True)

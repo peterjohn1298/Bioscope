@@ -8,22 +8,10 @@ import copy
 
 from models.market_model import calc_som
 from data.assumptions import SEGMENTS, PRICING, BM2
+from utils.theme import apply_theme, FOREST, MINT, AMBER, CHARCOAL, SEG_COLORS, chart_layout
 
 st.set_page_config(page_title="Revenue Model — BioScope", layout="wide")
-
-st.markdown("""
-<style>
-[data-testid="stDataFrame"] th,
-[data-testid="stDataFrame"] th div,
-[data-testid="stDataFrame"] th span,
-.dvn-scroller .col-header-cell,
-.dvn-scroller .col-header-cell span { color: #000000 !important; font-weight: 700 !important; }
-</style>
-""", unsafe_allow_html=True)
-
-
-GREEN = "#2ECC71"; BLUE = "#1B4F72"; ORANGE = "#E67E22"
-SEG_COLORS = [GREEN, BLUE, ORANGE, '#9B59B6', '#E74C3C', '#1ABC9C']
+apply_theme()
 
 st.title("💰 Revenue Model")
 st.markdown("Adjust assumptions in the sidebar — charts and numbers update live.")
@@ -47,18 +35,18 @@ with st.sidebar:
 
     st.divider()
     st.subheader("Pricing ($/sample)")
-    t1_p   = st.number_input("Tier 1 — Residue only",   200,  1500, PRICING['tier1']['price'],   step=25)
-    t12_p  = st.number_input("Tier 1+2 — + Welfare",    400,  2000, PRICING['tier12']['price'],  step=25)
-    t123_p = st.number_input("Tier 1+2+3 — Full Cert",  600,  3000, PRICING['tier123']['price'], step=25)
+    t1_p   = st.number_input("Tier 1 — Residue only",  200,  1500, PRICING['tier1']['price'],   step=25)
+    t12_p  = st.number_input("Tier 1+2 — + Welfare",   400,  2000, PRICING['tier12']['price'],  step=25)
+    t123_p = st.number_input("Tier 1+2+3 — Full Cert", 600,  3000, PRICING['tier123']['price'], step=25)
 
     st.divider()
     st.subheader("BM2 Lab Licensing")
-    bm2_y1      = st.number_input("Labs signed by Y1",        0,      10,      BM2['labs_y1'],            step=1)
-    bm2_y2      = st.number_input("Labs signed by Y2",        0,      20,      BM2['labs_y2'],            step=1)
-    bm2_y3      = st.number_input("Labs signed by Y3",        0,      50,      BM2['labs_y3'],            step=1)
-    license_fee = st.number_input("Annual license fee ($)",   50_000, 500_000, BM2['annual_license_fee'], step=10_000)
-    sample_fee  = st.number_input("Per-sample fee ($)",       5,      100,     BM2['per_sample_fee'],     step=5)
-    avg_samples = st.number_input("Avg samples/lab/year",     1_000,  100_000, BM2['avg_samples_per_lab'],step=1_000)
+    bm2_y1      = st.number_input("Labs signed by Y1",       0,       10,      BM2['labs_y1'],            step=1)
+    bm2_y2      = st.number_input("Labs signed by Y2",       0,       20,      BM2['labs_y2'],            step=1)
+    bm2_y3      = st.number_input("Labs signed by Y3",       0,       50,      BM2['labs_y3'],            step=1)
+    license_fee = st.number_input("Annual license fee ($)",  50_000,  500_000, BM2['annual_license_fee'], step=10_000)
+    sample_fee  = st.number_input("Per-sample fee ($)",      5,       100,     BM2['per_sample_fee'],     step=5)
+    avg_samples = st.number_input("Avg samples/lab/year",    1_000,   100_000, BM2['avg_samples_per_lab'],step=1_000)
 
     rev_per_lab = license_fee + sample_fee * avg_samples
     st.caption(f"Revenue per lab: **${rev_per_lab:,.0f}/yr**")
@@ -116,35 +104,36 @@ with left:
             x=['Year 1', 'Year 2', 'Year 3'],
             y=[y1_v[i]/1e6, y2_v[i]/1e6, y3_v[i]/1e6],
             marker_color=SEG_COLORS[i % len(SEG_COLORS)],
+            marker_line=dict(width=0),
         ))
-    fig_stack.update_layout(
+    fig_stack.update_layout(**chart_layout(
         barmode='stack', height=360,
-        yaxis=dict(title='$M', showgrid=True, gridcolor='#ECF0F1'),
+        yaxis=dict(title='$M', showgrid=True, gridcolor='#E8F5EE'),
         legend=dict(orientation='h', y=-0.3, font=dict(size=10)),
         margin=dict(l=0, r=0, t=10, b=80),
-        plot_bgcolor='white', paper_bgcolor='white',
-        transition={'duration': 400, 'easing': 'cubic-in-out'},
-    )
+    ))
     st.plotly_chart(fig_stack, use_container_width=True, key="revenue_by_segment")
 
 with right:
     st.subheader("BM1 Direct vs BM2 Licensing")
     fig_split = go.Figure()
     years = ['Year 1', 'Year 2', 'Year 3']
-    fig_split.add_trace(go.Bar(name='BM1 — Reference Lab (Direct)',
-                               x=years, y=[som['bm1']['y1']/1e6, som['bm1']['y2']/1e6, som['bm1']['y3']/1e6],
-                               marker_color=BLUE))
-    fig_split.add_trace(go.Bar(name='BM2 — Lab Licensing',
-                               x=years, y=[som['bm2']['y1']/1e6, som['bm2']['y2']/1e6, som['bm2']['y3']/1e6],
-                               marker_color=GREEN))
-    fig_split.update_layout(
+    fig_split.add_trace(go.Bar(
+        name='BM1 — Reference Lab (Direct)',
+        x=years, y=[som['bm1']['y1']/1e6, som['bm1']['y2']/1e6, som['bm1']['y3']/1e6],
+        marker_color=FOREST, marker_line=dict(width=0),
+    ))
+    fig_split.add_trace(go.Bar(
+        name='BM2 — Lab Licensing',
+        x=years, y=[som['bm2']['y1']/1e6, som['bm2']['y2']/1e6, som['bm2']['y3']/1e6],
+        marker_color=AMBER, marker_line=dict(width=0),
+    ))
+    fig_split.update_layout(**chart_layout(
         barmode='group', height=360,
-        yaxis=dict(title='$M', showgrid=True, gridcolor='#ECF0F1'),
+        yaxis=dict(title='$M', showgrid=True, gridcolor='#E8F5EE'),
         legend=dict(orientation='h', y=-0.15),
         margin=dict(l=0, r=0, t=10, b=60),
-        plot_bgcolor='white', paper_bgcolor='white',
-        transition={'duration': 400, 'easing': 'cubic-in-out'},
-    )
+    ))
     st.plotly_chart(fig_split, use_container_width=True, key="bm1_vs_bm2")
 
 # ── Customer table ─────────────────────────────────────────────────────────────

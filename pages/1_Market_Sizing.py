@@ -3,27 +3,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 import streamlit as st
 import plotly.graph_objects as go
-import plotly.express as px
 import pandas as pd
 import numpy as np
 
 from models.market_model import calc_topdown, calc_bottomup, segment_totals, calc_sam
 from data.assumptions import TAM_TOPDOWN, SEGMENTS, PRICING, ANALYTES
+from utils.theme import apply_theme, FOREST, MINT, AMBER, CHARCOAL, CREAM, SEG_COLORS, chart_layout
 
 st.set_page_config(page_title="Market Sizing — BioScope", layout="wide")
-
-st.markdown("""
-<style>
-[data-testid="stDataFrame"] th,
-[data-testid="stDataFrame"] th div,
-[data-testid="stDataFrame"] th span,
-.dvn-scroller .col-header-cell,
-.dvn-scroller .col-header-cell span { color: #000000 !important; font-weight: 700 !important; }
-</style>
-""", unsafe_allow_html=True)
-
-
-GREEN = "#2ECC71"; BLUE = "#1B4F72"; ORANGE = "#E67E22"
+apply_theme()
 
 st.title("📊 Market Sizing")
 st.markdown("Explore TAM through two independent methodologies. Adjust assumptions to stress-test the numbers.")
@@ -38,9 +26,9 @@ with tab1:
     with st.expander("Adjust Assumptions", expanded=False):
         c1, c2 = st.columns(2)
         with c1:
-            global_mkt = st.slider("Global Food Safety Testing Market ($B, 2024)",
-                                   min_value=15.0, max_value=40.0, value=TAM_TOPDOWN['global_market_2024_B'], step=0.5,
-                                   help="IMARC Group / Straits Research 2024 baseline")
+            global_mkt  = st.slider("Global Food Safety Testing Market ($B, 2024)",
+                                    15.0, 40.0, TAM_TOPDOWN['global_market_2024_B'], 0.5,
+                                    help="IMARC Group / Straits Research 2024 baseline")
             rapid_share = st.slider("Rapid Testing Share (%)",
                                     0.40, 0.85, TAM_TOPDOWN['rapid_testing_share'], 0.01,
                                     format="%.0f%%",
@@ -57,40 +45,37 @@ with tab1:
 
     params = {
         'global_market_2024_B': global_mkt,
-        'rapid_testing_share': rapid_share,
-        'na_share_of_global': na_share,
-        'us_share_of_na': us_share,
+        'rapid_testing_share':  rapid_share,
+        'na_share_of_global':   na_share,
+        'us_share_of_na':       us_share,
     }
     td = calc_topdown(params)
 
-    # KPIs
     k1, k2, k3 = st.columns(3)
-    k1.metric("Global TAM (BioScope Niche)", f"${td['global_tam']:.2f}B")
-    k2.metric("North America TAM", f"${td['na_tam']:.2f}B")
-    k3.metric("US TAM ★ Primary Market", f"${td['us_tam']:.2f}B")
+    k1.metric("Global TAM (Rapid Safety Testing)", f"${td['global_tam']:.2f}B")
+    k2.metric("North America TAM",                 f"${td['na_tam']:.2f}B")
+    k3.metric("US TAM ★ Primary Market",           f"${td['us_tam']:.2f}B")
 
-    # Waterfall
     labels = [s['label'] for s in td['waterfall']]
     values = [s['value'] for s in td['waterfall']]
-    pcts = [1.0] + [values[i]/values[0] for i in range(1, len(values))]
-    colors = [GREEN if i >= len(labels)-2 else BLUE for i in range(len(labels))]
+    pcts   = [1.0] + [values[i]/values[0] for i in range(1, len(values))]
+    colors = [AMBER if i == len(labels)-1 else FOREST for i in range(len(labels))]
 
     fig = go.Figure(go.Bar(
         y=labels, x=values, orientation='h',
-        marker_color=colors,
+        marker_color=colors, marker_line=dict(width=0),
         text=[f"${v:.2f}B  ({p*100:.1f}% of total)" for v, p in zip(values, pcts)],
         textposition='outside',
+        textfont=dict(color=CHARCOAL, size=11),
     ))
-    fig.update_layout(
+    fig.update_layout(**chart_layout(
         title="TAM Funnel — Each Step Applies a Market Filter",
-        height=350, margin=dict(l=0, r=200, t=40, b=10),
-        xaxis=dict(title="$B", showgrid=True),
-        yaxis=dict(autorange='reversed'),
-        plot_bgcolor='white', paper_bgcolor='white',
-    )
+        height=300, margin=dict(l=0, r=220, t=40, b=10),
+        xaxis=dict(title="$B", showgrid=True, gridcolor='#E8F5EE'),
+        yaxis=dict(autorange='reversed', showgrid=False),
+    ))
     st.plotly_chart(fig, use_container_width=True)
 
-    # Market leader cross-validation table
     st.markdown("#### Market Leader Cross-Validation")
     cv_data = {
         'Company': ['Eurofins', 'SGS', 'Neogen', 'Mérieux NutriSciences', 'FSNS/Certified Group', 'Regional independents (500+)'],
@@ -114,9 +99,9 @@ with tab2:
 
     with st.expander("Adjust Pricing", expanded=False):
         cp1, cp2, cp3 = st.columns(3)
-        t1_price  = cp1.number_input("Tier 1 Price ($/sample)", 200, 1500, PRICING['tier1']['price'],   step=25, help="Residue compliance panel only")
-        t12_price = cp2.number_input("Tier 1+2 Price ($/sample)", 400, 2000, PRICING['tier12']['price'],  step=25, help="Residue + welfare biomarkers")
-        t123_price= cp3.number_input("Tier 1+2+3 Price ($/sample)", 600, 3000, PRICING['tier123']['price'], step=25, help="Full certification report")
+        t1_price   = cp1.number_input("Tier 1 Price ($/sample)",     200, 1500, PRICING['tier1']['price'],   step=25)
+        t12_price  = cp2.number_input("Tier 1+2 Price ($/sample)",   400, 2000, PRICING['tier12']['price'],  step=25)
+        t123_price = cp3.number_input("Tier 1+2+3 Price ($/sample)", 600, 3000, PRICING['tier123']['price'], step=25)
 
     custom_pricing = {
         'tier1':   {**PRICING['tier1'],   'price': t1_price},
@@ -124,87 +109,78 @@ with tab2:
         'tier123': {**PRICING['tier123'], 'price': t123_price},
     }
 
-    bu_rows = calc_bottomup(SEGMENTS, custom_pricing, ANALYTES)
+    bu_rows  = calc_bottomup(SEGMENTS, custom_pricing, ANALYTES)
     seg_tots = segment_totals(bu_rows)
 
-    # Segment summary
     seg_df = pd.DataFrame([
         {
             'Segment': v['segment'],
-            'Market Spend (Commercial Labs)': v['comm_rev'],
-            'BioScope Rev @ 100% Share': v['bio_rev_100pct'],
-            'Y3 SOM': v['som_y3'],
+            'Market Spend (Commercial Labs)': f"${v['comm_rev']/1e6:.1f}M",
+            'BioScope Rev @ 100% Share':      f"${v['bio_rev_100pct']/1e6:.1f}M",
+            'Y3 SOM':                          f"${v['som_y3']/1e6:.1f}M",
         }
         for v in seg_tots.values()
     ])
-    seg_df_fmt = seg_df.copy()
-    for col in ['Market Spend (Commercial Labs)', 'BioScope Rev @ 100% Share', 'Y3 SOM']:
-        seg_df_fmt[col] = seg_df_fmt[col].apply(lambda x: f"${x/1e6:.1f}M")
-
     totals_row = pd.DataFrame([{
         'Segment': 'TOTAL',
         'Market Spend (Commercial Labs)': f"${sum(v['comm_rev'] for v in seg_tots.values())/1e6:.0f}M",
-        'BioScope Rev @ 100% Share': f"${sum(v['bio_rev_100pct'] for v in seg_tots.values())/1e6:.0f}M",
-        'Y3 SOM': f"${sum(v['som_y3'] for v in seg_tots.values())/1e6:.0f}M",
+        'BioScope Rev @ 100% Share':      f"${sum(v['bio_rev_100pct'] for v in seg_tots.values())/1e6:.0f}M",
+        'Y3 SOM':                          f"${sum(v['som_y3'] for v in seg_tots.values())/1e6:.0f}M",
     }])
-    st.dataframe(pd.concat([seg_df_fmt, totals_row], ignore_index=True), use_container_width=True, hide_index=True)
+    st.dataframe(pd.concat([seg_df, totals_row], ignore_index=True), use_container_width=True, hide_index=True)
 
-    # Stacked bar: BioScope rev @ 100% share by segment
-    seg_names = list(seg_tots.keys())
-    seg_labels = [seg_tots[k]['segment'] for k in seg_names]
-    bio_vals = [seg_tots[k]['bio_rev_100pct']/1e6 for k in seg_names]
+    seg_keys   = [k for k in seg_tots]
+    seg_labels = [seg_tots[k]['segment'] for k in seg_keys]
+    bio_vals   = [seg_tots[k]['bio_rev_100pct']/1e6 for k in seg_keys]
 
     fig2 = go.Figure(go.Bar(
         x=seg_labels, y=bio_vals,
-        marker_color=[GREEN, BLUE, ORANGE, '#9B59B6', '#E74C3C'],
+        marker_color=SEG_COLORS[:len(seg_labels)],
+        marker_line=dict(width=0),
         text=[f"${v:.0f}M" for v in bio_vals],
         textposition='outside',
+        textfont=dict(color=CHARCOAL),
     ))
-    fig2.update_layout(
+    fig2.update_layout(**chart_layout(
         title="BioScope Addressable Revenue @ 100% Penetration (by Segment)",
-        height=360, margin=dict(l=0, r=0, t=50, b=10),
-        yaxis=dict(title="$M", showgrid=True),
-        plot_bgcolor='white', paper_bgcolor='white',
-    )
+        height=340, margin=dict(l=0, r=0, t=50, b=10),
+        yaxis=dict(title="$M", showgrid=True, gridcolor='#E8F5EE'),
+    ))
     st.plotly_chart(fig2, use_container_width=True)
 
-    # Heatmap: analyte × segment revenue
     st.markdown("#### Analyte × Segment Heatmap — BioScope Revenue @ 100% Share ($M)")
-    seg_keys = [s['key'] for s in SEGMENTS]
-    seg_labels_h = [s['name'] for s in SEGMENTS]
+    seg_key_list   = [s['key'] for s in SEGMENTS]
+    seg_labels_h   = [s['name'] for s in SEGMENTS]
     analyte_labels = [a['name'] for a in ANALYTES]
 
-    heat_data = np.zeros((len(ANALYTES), len(seg_keys)))
+    heat_data = np.zeros((len(ANALYTES), len(seg_key_list)))
     for r in bu_rows:
         ai = next(i for i, a in enumerate(ANALYTES) if a['name'] == r['analyte'])
-        si = seg_keys.index(r['segment_key'])
+        si = seg_key_list.index(r['segment_key'])
         heat_data[ai][si] = r['bio_rev_100pct'] / 1e6
 
     fig_heat = go.Figure(go.Heatmap(
-        z=heat_data,
-        x=seg_labels_h,
-        y=analyte_labels,
-        colorscale='Blues',
+        z=heat_data, x=seg_labels_h, y=analyte_labels,
+        colorscale=[[0, '#F0FDF4'], [0.5, '#52B788'], [1, '#1B4332']],
         text=[[f"${v:.0f}M" for v in row] for row in heat_data],
         texttemplate="%{text}",
         textfont=dict(size=10),
-        colorbar=dict(title="$M"),
+        colorbar=dict(title="$M", tickfont=dict(size=10)),
     ))
-    fig_heat.update_layout(
+    fig_heat.update_layout(**chart_layout(
         height=460, margin=dict(l=0, r=0, t=20, b=0),
-        xaxis=dict(tickangle=-20),
-        plot_bgcolor='white', paper_bgcolor='white',
-    )
+        xaxis=dict(tickangle=-20, showgrid=False),
+        yaxis=dict(showgrid=False),
+    ))
     st.plotly_chart(fig_heat, use_container_width=True)
 
-    # Bottom-up vs top-down reconciliation
     bu_us_total = sum(v['bio_rev_100pct'] for v in seg_tots.values())
     td_base = calc_topdown()
     st.markdown("#### Bottom-Up vs. Top-Down Reconciliation")
     rc1, rc2, rc3 = st.columns(3)
     rc1.metric("Bottom-Up US TAM (BioScope 100%)", f"${bu_us_total/1e9:.2f}B")
-    rc2.metric("Top-Down US TAM", f"${td_base['us_tam']:.2f}B")
-    rc3.metric("Ratio (Bottom-Up / Top-Down)", f"{(bu_us_total/1e9)/td_base['us_tam']:.1f}×")
+    rc2.metric("Top-Down US TAM",                   f"${td_base['us_tam']:.2f}B")
+    rc3.metric("Ratio (Bottom-Up / Top-Down)",       f"{(bu_us_total/1e9)/td_base['us_tam']:.1f}×")
     st.caption(
         f"Bottom-up (${bu_us_total/1e9:.2f}B BioScope Rev @ 100%) vs top-down US TAM (${td_base['us_tam']:.2f}B) — "
         "the bottom-up captures fragmented commercial lab spend; top-down is the conservatism anchor."
