@@ -203,8 +203,8 @@ with tab2:
     st.markdown("#### Bottom-Up vs. Top-Down Reconciliation")
     rc1, rc2, rc3 = st.columns(3)
     rc1.metric("Bottom-Up US TAM (BioScope 100%)", f"${bu_us_total/1e9:.2f}B")
-    rc2.metric("Top-Down US TAM", f"${td_base['us_tam']/1e9:.2f}B")
-    rc3.metric("Ratio (Bottom-Up / Top-Down)", f"{bu_us_total/td_base['us_tam']:.1f}×")
+    rc2.metric("Top-Down US TAM", f"${td_base['us_tam']:.2f}B")
+    rc3.metric("Ratio (Bottom-Up / Top-Down)", f"{(bu_us_total/1e9)/td_base['us_tam']:.1f}×")
     st.caption(
         f"Bottom-up (${bu_us_total/1e9:.2f}B BioScope Rev @ 100%) vs top-down US TAM (${td_base['us_tam']:.2f}B) — "
         "the bottom-up captures fragmented commercial lab spend; top-down is the conservatism anchor."
