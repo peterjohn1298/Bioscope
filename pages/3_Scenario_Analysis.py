@@ -182,12 +182,3 @@ rows.append({
 })
 st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
-# ── Rob's cross-check ──────────────────────────────────────────────────────────
-rob_y5 = 62_000_000
-st.info(
-    f"**Cross-check vs. BioScope internal model:** Rob's stated Y5 ARR target is "
-    f"${rob_y5/1e6:.0f}M. "
-    f"Bear Y3: ${bear['total']['y3']/1e6:.0f}M ({bear['total']['y3']/rob_y5:.1f}×) | "
-    f"Base Y3: ${base['total']['y3']/1e6:.0f}M ({base['total']['y3']/rob_y5:.1f}×) | "
-    f"Bull Y3: ${bull['total']['y3']/1e6:.0f}M ({bull['total']['y3']/rob_y5:.1f}×)"
-)
