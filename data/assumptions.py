@@ -67,79 +67,79 @@ SEGMENTS = [
 ]
 
 PRICING = {
-    'tier1':   {'label': 'Tier 1 — Residue Compliance Panel',  'price': 500,  'cogs': 90,  'gm': 0.820},
-    'tier12':  {'label': 'Tier 1+2 — Residue + Welfare',       'price': 800,  'cogs': 130, 'gm': 0.8375},
-    'tier123': {'label': 'Tier 1+2+3 — Full Certification',    'price': 1200, 'cogs': 140, 'gm': 0.8833},
+    'tier1':   {'label': 'Tier 1 — Residue Compliance Panel',  'price': 500,  'cogs': 100, 'gm': 0.80},
+    'tier12':  {'label': 'Tier 1+2 — Residue + Welfare',       'price': 700,  'cogs': 130, 'gm': 0.8143},
+    'tier123': {'label': 'Tier 1+2+3 — Full Certification',    'price': 1000, 'cogs': 140, 'gm': 0.86},
 }
 
 ANALYTES = [
     {
-        'key': 'pfas', 'name': 'PFAS panel', 'tier': 1, 'comm_price': 600,
+        'key': 'pfas', 'name': 'PFAS panel', 'tier': 1, 'comm_price': 600, 'sam_include': True,
         'usage': {'retailers': 0.50, 'processors': 0.30, 'brands': 0.40, 'exporters': 0.20, 'plants': 0.10},
         'note': 'Retailers: private label compliance. Exporters: less regulated for PFAS currently.',
     },
     {
-        'key': 'vet_drugs', 'name': 'Vet drugs multi-residue', 'tier': 1, 'comm_price': 300,
+        'key': 'vet_drugs', 'name': 'Vet drugs multi-residue', 'tier': 1, 'comm_price': 300, 'sam_include': True,
         'usage': {'retailers': 0.80, 'processors': 0.90, 'brands': 0.60, 'exporters': 0.95, 'plants': 0.70},
         'note': 'Near-universal for export compliance (EU/Japan). Retailers demand residue-free.',
     },
     {
-        'key': 'pesticides', 'name': 'Pesticides MRA', 'tier': 1, 'comm_price': 515,
+        'key': 'pesticides', 'name': 'Pesticides MRA', 'tier': 1, 'comm_price': 515, 'sam_include': True,
         'usage': {'retailers': 0.70, 'processors': 0.60, 'brands': 0.80, 'exporters': 0.70, 'plants': 0.50},
         'note': 'Premium brands: core "clean" claim. Exporters: EU MRL compliance.',
     },
     {
-        'key': 'heavy_metals', 'name': 'Heavy metals', 'tier': 1, 'comm_price': 160,
+        'key': 'heavy_metals', 'name': 'Heavy metals', 'tier': 1, 'comm_price': 160, 'sam_include': False,
         'usage': {'retailers': 0.60, 'processors': 0.50, 'brands': 0.60, 'exporters': 0.40, 'plants': 0.30},
         'note': 'Standard QA panel included in most Tier 1 suites.',
     },
     {
-        'key': 'mycotoxins', 'name': 'Mycotoxins combo', 'tier': 1, 'comm_price': 425,
+        'key': 'mycotoxins', 'name': 'Mycotoxins combo', 'tier': 1, 'comm_price': 425, 'sam_include': False,
         'usage': {'retailers': 0.30, 'processors': 0.50, 'brands': 0.30, 'exporters': 0.60, 'plants': 0.40},
         'note': 'Higher for grain/feed processors and exporters with grain inclusion.',
     },
     {
-        'key': 'pahs', 'name': 'PAHs', 'tier': 1, 'comm_price': 225,
+        'key': 'pahs', 'name': 'PAHs', 'tier': 1, 'comm_price': 225, 'sam_include': False,
         'usage': {'retailers': 0.20, 'processors': 0.30, 'brands': 0.20, 'exporters': 0.40, 'plants': 0.20},
         'note': 'Smoked/grilled products; export compliance markets.',
     },
     {
-        'key': 'plasticizers', 'name': 'Plasticizers / BPA / Nitrosamines', 'tier': 1, 'comm_price': 275,
+        'key': 'plasticizers', 'name': 'Plasticizers / BPA / Nitrosamines', 'tier': 1, 'comm_price': 275, 'sam_include': False,
         'usage': {'retailers': 0.15, 'processors': 0.25, 'brands': 0.20, 'exporters': 0.10, 'plants': 0.10},
         'note': 'Emerging concern. Growing regulatory pressure.',
     },
     {
-        'key': 'stress', 'name': 'Stress biomarkers', 'tier': 2, 'comm_price': 350,
+        'key': 'stress', 'name': 'Stress biomarkers', 'tier': 2, 'comm_price': 350, 'sam_include': True,
         'usage': {'retailers': 0.25, 'processors': 0.10, 'brands': 0.50, 'exporters': 0.05, 'plants': 0.05},
         'note': 'Retailers + premium brands. Welfare claims are commercial differentiator.',
     },
     {
-        'key': 'freshness', 'name': 'Freshness / K-value', 'tier': 2, 'comm_price': 200,
+        'key': 'freshness', 'name': 'Freshness / K-value', 'tier': 2, 'comm_price': 200, 'sam_include': True,
         'usage': {'retailers': 0.20, 'processors': 0.30, 'brands': 0.20, 'exporters': 0.10, 'plants': 0.15},
         'note': 'Large processors: shelf-life optimization. Retailers: private label QC.',
     },
     {
-        'key': 'oxidation', 'name': 'Oxidation markers', 'tier': 2, 'comm_price': 375,
+        'key': 'oxidation', 'name': 'Oxidation markers', 'tier': 2, 'comm_price': 375, 'sam_include': True,
         'usage': {'retailers': 0.20, 'processors': 0.35, 'brands': 0.25, 'exporters': 0.05, 'plants': 0.10},
         'note': 'R&D and shelf-life prediction. Processors + premium brands.',
     },
     {
-        'key': 'species', 'name': 'Species ID / PCR', 'tier': 3, 'comm_price': 275,
+        'key': 'species', 'name': 'Species ID / PCR', 'tier': 3, 'comm_price': 275, 'sam_include': False,
         'usage': {'retailers': 0.15, 'processors': 0.10, 'brands': 0.30, 'exporters': 0.20, 'plants': 0.05},
         'note': 'Premium brands + retailers with fraud exposure.',
     },
     {
-        'key': 'fatty_acid', 'name': 'Fatty acid / feeding system', 'tier': 3, 'comm_price': 250,
+        'key': 'fatty_acid', 'name': 'Fatty acid / feeding system', 'tier': 3, 'comm_price': 250, 'sam_include': True,
         'usage': {'retailers': 0.10, 'processors': 0.05, 'brands': 0.40, 'exporters': 0.05, 'plants': 0.02},
         'note': 'Core for grass-fed/pasture-raised claims. Premium brands primary user.',
     },
     {
-        'key': 'geo_fp', 'name': 'Geographic fingerprint', 'tier': 3, 'comm_price': 600,
+        'key': 'geo_fp', 'name': 'Geographic fingerprint', 'tier': 3, 'comm_price': 600, 'sam_include': False,
         'usage': {'retailers': 0.05, 'processors': 0.03, 'brands': 0.15, 'exporters': 0.10, 'plants': 0.01},
         'note': 'Niche; origin claims. Few commercial labs offer IRMS.',
     },
     {
-        'key': 'vitamins', 'name': 'Fat-soluble vitamins', 'tier': 3, 'comm_price': 1000,
+        'key': 'vitamins', 'name': 'Fat-soluble vitamins', 'tier': 3, 'comm_price': 1000, 'sam_include': True,
         'usage': {'retailers': 0.05, 'processors': 0.05, 'brands': 0.10, 'exporters': 0.02, 'plants': 0.01},
         'note': 'Nutrient-density claims. Mostly premium/natural brands.',
     },

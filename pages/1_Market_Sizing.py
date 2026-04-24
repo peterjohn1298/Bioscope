@@ -45,15 +45,7 @@ with tab1:
                                     0.40, 0.85, TAM_TOPDOWN['rapid_testing_share'], 0.01,
                                     format="%.0f%%",
                                     help="MarketsandMarkets: ~65% of food testing is rapid methods")
-            outsourced = st.slider("Outsourced / Contract Lab Share (%)",
-                                   0.25, 0.70, TAM_TOPDOWN['outsourced_share'], 0.01,
-                                   format="%.0f%%",
-                                   help="Eurofins FY2024: ~45% of total is outsourced")
         with c2:
-            niche_share = st.slider("BioScope Niche Share — residue + auth + welfare (%)",
-                                    0.30, 0.80, TAM_TOPDOWN['bioscope_niche_share'], 0.01,
-                                    format="%.0f%%",
-                                    help="Excludes pathogen/microbiology (Neogen/bioMérieux territory)")
             na_share = st.slider("North America Share of Global (%)",
                                  0.25, 0.55, TAM_TOPDOWN['na_share_of_global'], 0.01,
                                  format="%.0f%%",
@@ -66,8 +58,6 @@ with tab1:
     params = {
         'global_market_2024_B': global_mkt,
         'rapid_testing_share': rapid_share,
-        'outsourced_share': outsourced,
-        'bioscope_niche_share': niche_share,
         'na_share_of_global': na_share,
         'us_share_of_na': us_share,
     }
@@ -115,7 +105,7 @@ with tab1:
         ],
     }
     st.dataframe(pd.DataFrame(cv_data), use_container_width=True, hide_index=True)
-    st.caption("Cross-validation anchors our $1.3B US TAM — consistent with named competitor aggregate of ~$6.6B total (outsourced + in-house).")
+    st.caption(f"Cross-validation anchors our ${td['us_tam']:.1f}B US TAM — consistent with named competitor aggregate of ~$6.6B total (outsourced + in-house).")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab2:
@@ -216,6 +206,6 @@ with tab2:
     rc2.metric("Top-Down US TAM", f"${td_base['us_tam']/1e9:.2f}B")
     rc3.metric("Ratio (Bottom-Up / Top-Down)", f"{bu_us_total/td_base['us_tam']:.1f}×")
     st.caption(
-        "Bottom-up ($4.8B) exceeds top-down ($1.3B) — typical for a novel multi-analyte service "
-        "capturing spend currently fragmented across multiple labs. The top-down is a conservatism anchor."
+        f"Bottom-up (${bu_us_total/1e9:.2f}B BioScope Rev @ 100%) vs top-down US TAM (${td_base['us_tam']:.2f}B) — "
+        "the bottom-up captures fragmented commercial lab spend; top-down is the conservatism anchor."
     )

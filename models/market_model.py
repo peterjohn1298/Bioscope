@@ -13,24 +13,18 @@ def calc_topdown(params=None):
     p = {**TAM_TOPDOWN, **(params or {})}
     g = p['global_market_2024_B']
     rapid = g * p['rapid_testing_share']
-    outsourced = rapid * p['outsourced_share']
-    niche = outsourced * p['bioscope_niche_share']
-    na = niche * p['na_share_of_global']
+    na = rapid * p['na_share_of_global']
     us = na * p['us_share_of_na']
     return {
         'global_market': g,
-        'after_rapid': rapid,
-        'after_outsourced': outsourced,
-        'global_tam': niche,
+        'global_tam': rapid,
         'na_tam': na,
         'us_tam': us,
         'waterfall': [
-            {'label': 'Global Food Safety Testing (2024)', 'value': g},
-            {'label': '× Rapid testing share (65%)',        'value': rapid},
-            {'label': '× Outsourced / contract labs (45%)', 'value': outsourced},
-            {'label': '× BioScope niche — residue + auth + welfare (55%)', 'value': niche},
-            {'label': 'North America TAM (38% of global)',  'value': na},
-            {'label': 'US TAM ★ (87% of N.Am)',            'value': us},
+            {'label': 'Global Food Safety Testing (2024)',  'value': g},
+            {'label': f"× Rapid testing share ({p['rapid_testing_share']*100:.0f}%)", 'value': rapid},
+            {'label': f"× North America share ({p['na_share_of_global']*100:.0f}%)", 'value': na},
+            {'label': f"US TAM ★ ({p['us_share_of_na']*100:.0f}% of N.Am)",         'value': us},
         ],
         'params': p,
     }
@@ -39,7 +33,10 @@ def calc_topdown(params=None):
 def calc_bottomup(segments=None, pricing=None, analytes=None):
     segs = segments or SEGMENTS
     prc = pricing or PRICING
-    anals = analytes or ANALYTES
+    if analytes is None:
+        anals = [a for a in ANALYTES if a.get('sam_include', True)]
+    else:
+        anals = analytes
 
     t_price = {t: prc[TIER_PRICE_KEY[t]]['price'] for t in (1, 2, 3)}
     t_comm_price = {a['key']: a['comm_price'] for a in anals}
@@ -92,10 +89,9 @@ def segment_totals(bu_rows):
 def calc_som(segments=None, pricing=None, analytes=None, bm2_params=None):
     segs = segments or SEGMENTS
     prc = pricing or PRICING
-    anals = analytes or ANALYTES
     bm2 = bm2_params or BM2
 
-    bu_rows = calc_bottomup(segs, prc, anals)
+    bu_rows = calc_bottomup(segs, prc, analytes)
     seg_tots = segment_totals(bu_rows)
 
     result_segs = []
@@ -152,10 +148,11 @@ def calc_sam(segments=None):
     segs = segments or SEGMENTS
     p = TAM_TOPDOWN
 
+    sam_analytes = [a for a in ANALYTES if a.get('sam_include', True)]
     sam_segments = []
     for seg in segs:
         us_market = 0
-        for analyte in ANALYTES:
+        for analyte in sam_analytes:
             usage = analyte['usage'].get(seg['key'], 0)
             tests = seg['buyers'] * seg['samples_per_buyer'] * usage
             us_market += tests * analyte['comm_price']  # commercial price, not BioScope price

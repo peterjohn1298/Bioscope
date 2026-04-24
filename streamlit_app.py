@@ -102,7 +102,7 @@ with c4:
 with c5:
     st.markdown(f"""<div class="metric-card" style="border-left-color:#E74C3C">
         <div class="metric-label">Gross Margin</div>
-        <div class="metric-value">82–88%</div>
+        <div class="metric-value">80–86%</div>
         <div class="metric-sub">By tier (T1 → T3)</div>
     </div>""", unsafe_allow_html=True)
 
@@ -180,10 +180,10 @@ summary_data = {
     'Value': [f"${tam_glob/1e9:.2f}B", f"${tam_na/1e9:.2f}B", f"${tam_us/1e9:.2f}B",
               f"${total_sam/1e9:.1f}B", f"${som_y1/1e6:.1f}M", f"${som_y2/1e6:.1f}M", f"${som_y3/1e6:.0f}M"],
     'Methodology': [
-        'Global × rapid × outsourced × BioScope niche',
+        'Global × rapid testing share (65%)',
         'Global TAM × N.Am share (38%)',
         'N.Am TAM × US share (87%)',
-        'Bottom-up, N.Am buyers × all analytes × BioScope pricing',
+        'Bottom-up, N.Am buyers × 8 core analytes × BioScope pricing',
         'BM1 direct + BM2 licensing',
         'BM1 direct + BM2 licensing',
         'BM1 direct + BM2 licensing (7 labs)',
